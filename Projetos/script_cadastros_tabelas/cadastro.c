@@ -36,9 +36,6 @@ entrada_banco cadastrar(entrada_banco ps){
 
 int main(){
 
-	int teste;
-	scanf("%d", &teste);
-
 	entrada_banco pessoas[5];	
 	pessoas[0] = cadastrar(pessoas[0]);
 	printf("Nome: %s\n", pessoas[0].nome);
