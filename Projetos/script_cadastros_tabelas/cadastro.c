@@ -20,7 +20,7 @@ entrada_banco cadastrar(entrada_banco ps){
 	}while((int)strlen(ps.nome) < 2 || ps.nome[(int)strlen(ps.nome)-1] != '\n');
 	
 	// isso aqui pega o penúltimo caractere (se for um "\n") e troca por um "\0"
-	
+
 	if ((int)strlen(ps.nome) < tamanho_nomes-1)
 		ps.nome[(int)strlen(ps.nome)-1] = '\0';
 
@@ -37,7 +37,6 @@ entrada_banco cadastrar(entrada_banco ps){
 int main(){
 
 	int teste;
-	
 	scanf("%d", &teste);
 
 	entrada_banco pessoas[5];	
