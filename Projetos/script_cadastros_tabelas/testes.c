@@ -15,7 +15,6 @@ int main(){
 
 	fgets(texto, 5, stdin);
 	setbuf(stdin, NULL);
-	setbuf(stdout, NULL);
 	
 	//se ele pedir pra eu digitar alguma coisa, não tem nada lá no buffer
 	getchar();
