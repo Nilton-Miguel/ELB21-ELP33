@@ -51,68 +51,48 @@ char retira_da_pilha(Pilha * p){
     return caractere;
 }
 
-// subrotina que testa se dois delimitadores se balanceiam, retorna 0 para não e 1 para sim.
-int balanceia(char abertura, char fechamento){
-
-    int resultado = 0;
-
-    if ((abertura == '(' && fechamento == ')') || (abertura == '[' && fechamento == ']') || (abertura == '{' && fechamento == '}')){
-        resultado = 1;
-    }
-    return resultado;
-};
-
-// subrotina para verificar se o caractere é um dos delimitadores: 0 para não, 1 para abertura e 2 para fechamento.
-int delimitador(char caractere){
-
-    int resultado = 0;
-
-    if (caractere == '(' || caractere == '{' || caractere == '['){
-        resultado = 1;
-    }
-    else if (caractere == ')' || caractere == '}' || caractere == ']'){
-        resultado = 2;
-    }
-    return resultado;
-}
-
 // subrotina para checar o balanceamento de delimitadores: retorna 1 se correto e 0 caso incorreto.
 int averiguar_delimitadores(Pilha * p, char * texto){
 
-    int resultado = 0;
+    // resultado começa em -1.
+    int resultado = -1;
     int indice = 0;
 
-    while(texto[indice] != '\0'){
+    while (texto[indice] != 0){
 
-        int tipo_de_caractere = delimitador(texto[indice]);
+        // letras, operadores e espaços não passam nesse teste (só precisamos avaliar delimitadores).
+        if (texto[indice] == '(' || texto[indice] == '[' || texto[indice] == '{' || texto[indice] == ')' || texto[indice] == ']' || texto[indice] == '}'){
 
-        if (tipo_de_caractere != 0){
-
-            // caso a pilha esteja vazia, insere o delimitador não importando qual seja.
-            if (p -> topo == NULL){
+            // se for uma abertura, insere.
+            if (texto[indice] == '(' || texto[indice] == '{' || texto[indice] == '['){
                 insere_na_pilha(p, texto[indice]);
             }
-            // se o delimitador for uma abertura, é inserido na pilha.
-            else if (tipo_de_caractere == 1){
-                insere_na_pilha(p, texto[indice]);
+            // se for um fechamento e a pilha está vazia, erro.
+            else if ((texto[indice] == ')' || texto[indice] == '}' || texto[indice] == ']') && p -> topo == NULL){
+                resultado = 0;
+                break;
             }
-            // se o delimitador for um fechamento há 2 casos:
-            else if (tipo_de_caractere == 2){
-                // se o fechamento balancear o delimitador no topo da pilha, retira-se quem já está na pilha, como se eles tivessem se "cancelado".
-                if (balanceia(p -> topo -> caractere, texto[indice])){
-                    retira_da_pilha(p);
-                }
-                // para outros casos, apenas insira o delimitador na pilha.
-                else{
-                    insere_na_pilha(p, texto[indice]);
-                }
+            // 3 casos de pares corretos.
+            else if (texto[indice] == ')' && p -> topo -> caractere == '('){
+                retira_da_pilha(p);
+            }
+            else if (texto[indice] == '}' && p -> topo -> caractere == '{'){
+                retira_da_pilha(p);
+            }
+            else if (texto[indice] == ']' && p -> topo -> caractere == '['){
+                retira_da_pilha(p);
+            }
+            // se não passou em nenhum dos testes até agora, posso afirmar com certeza que é um fechamento errado.
+            else{
+                resultado = 0;
+                break;
             }
         }
         indice++;
     }
 
-    // se a pilha já está vazia ao final do processo, então os delimitadores estão balanceados.
-    if (p -> topo == NULL){
+    // se o resultado não for mais -1, algum fechamento já apresentou erro durante a leitura da string e resultado agora é 0.
+    if (p -> topo == NULL && resultado == -1){
         resultado = 1;
     }
     // se a pilha não está vazia, isso pode interferir nos próximos usos da função, fazer então uma "limpeza de buffer", para que no próximo uso a pilha esteja zerada.
@@ -127,11 +107,12 @@ int averiguar_delimitadores(Pilha * p, char * texto){
 int main(void){
 
     Pilha * buffer_delimitadores = nova_pilha();
-    averiguar_delimitadores(buffer_delimitadores, "()[]{}\0");
-    averiguar_delimitadores(buffer_delimitadores, ")(}{][\0");
-    averiguar_delimitadores(buffer_delimitadores, "(] {] []\0");
-    averiguar_delimitadores(buffer_delimitadores, "[({})]\0");
-    averiguar_delimitadores(buffer_delimitadores, "[(){}[]\0");
+    printf("%d\n", averiguar_delimitadores(buffer_delimitadores, "(a + b)\0"));
+    printf("%d\n", averiguar_delimitadores(buffer_delimitadores, ")a + b)\0"));
+    printf("%d\n", averiguar_delimitadores(buffer_delimitadores, "(a + b}\0"));
+    printf("%d\n", averiguar_delimitadores(buffer_delimitadores, "a + b)\0"));
+    printf("%d\n", averiguar_delimitadores(buffer_delimitadores, "[{(a + b)}]\0"));
+    printf("%d\n", averiguar_delimitadores(buffer_delimitadores, "a + b\0"));
 
     return 0;
 }
