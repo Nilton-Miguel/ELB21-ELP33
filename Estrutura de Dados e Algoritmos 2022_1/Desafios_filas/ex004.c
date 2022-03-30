@@ -1,3 +1,7 @@
+/* Nilton Miguel Guimarães de Souza - UTFPR - 2022
+
+Neste exercício uso uma pilha auxiliar para inverter a ordem dos elementos de uma pilha principal, neste processo eu deixo de passar para a fila auxiliar qualquer elemento ímpar. Depois devolvo à pilha original os elementos restantes. Ao fim, a ordem está preservada por terem ocorrido duas inversões, mas não há mais elementos ímpares na pilha original.
+*/
 # include <stdio.h>
 # include <stdlib.h>
 
@@ -69,8 +73,6 @@ int main(void){
     insere_pilha(pilha1, 6);
     insere_pilha(pilha1, 7);
     insere_pilha(pilha1, 8);
-    insere_pilha(pilha1, 10);
-    insere_pilha(pilha1, 12);
 
     retira_impares(pilha1);
 

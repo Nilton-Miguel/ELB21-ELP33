@@ -1,3 +1,7 @@
+/* Nilton Miguel Guimarães de Souza - UTFPR - 2022
+
+Neste exercício usei uma pilha para inverter a ordem dos elementos de uma fila.
+*/
 # include <stdio.h>
 # include <stdlib.h>
 

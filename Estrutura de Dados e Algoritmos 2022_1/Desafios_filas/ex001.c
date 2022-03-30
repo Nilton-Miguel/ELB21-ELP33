@@ -1,3 +1,7 @@
+/* Nilton Miguel Guimarães de Souza - UTFPR - 2022
+
+Este código fonte serve apenas para provar os valores estimados de saída depois dos procedimentos requeridos.
+*/
 # include <stdio.h>
 # include <stdlib.h>
 
