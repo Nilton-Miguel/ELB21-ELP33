@@ -42,7 +42,7 @@ int push_simples(ListaSimples * lista, int indice, int valor){
     }
     /* 
     O indice desejado precisa estar dentro das margens aceitas pela estrutura 
-        indice = 0 ......................... inserir no início
+        indice = 0 .......................... inserir no início
         0 < indice < lista -> tamanho ......... inserir no meio   
         indice = lista -> tamanho ............ inserir no final
     */

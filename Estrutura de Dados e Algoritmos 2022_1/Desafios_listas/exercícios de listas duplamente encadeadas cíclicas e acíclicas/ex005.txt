@@ -1,0 +1,27 @@
+Nilton Miguel Guimarães de Souza - UTFPR  - 2022.1
+
+A função abaixo faz parte de uma lista simplesmente encadeada circular. Explique qual o objetivo dela, qual o erro em sua implementação, e como corrigi-lo.
+
+
+1   int f1(ListaCircular * lista){ 
+2   Elemento * and = lista -> inicio; 
+3   int x = 0; 
+4   while(and != NULL) { 
+5       if(and -> dado % 2 == 0) 
+6           x++; 
+9       and = and -> proximo; 
+8       } 
+9       return x; 
+10  }
+
+O laço iniciado na linha 4 percorre a lista até após o último elemento e verifica se o valor é par, caso o seja, é incrementado um contador x. Portanto a função f1 retornaria quantos números pares há numa fila não circular.
+
+O problema da implementação é justamente esse, essa função funcionaria perfeitamente para uma fila não circular, mas uma fila circular não tem nenhum ponteiro para NULL, não há um demarcador explícito de "final", portanto ao executar essa função ela rodaria um número indeterminado de ciclos.
+
+Poderíamos corrigi-lo de várias maneiras:
+    
+    1 Tornando-a uma função para listas simplesmente encadeadas.
+
+    2 Usando a propriedade tamanho das listas e construir um laço "for" em vez de um laço "while".
+
+    3 Substituir a condição de encontro de NULL pelo encontro de lista -> inicio e usar um laço "do while". Já que quando o ponteiro auxiliar encontrar o ponteiro de referência da lista, ele logicamente terminou um ciclo.
