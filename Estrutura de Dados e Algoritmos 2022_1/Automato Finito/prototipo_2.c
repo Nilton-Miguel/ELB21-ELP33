@@ -2,12 +2,13 @@
 # include <stdlib.h>
 # define NONE -1
 
-// Estruturas ------------------------------------------------------------------------
+/* Estruturas ------------------------------------------------------------------------*/
 
 // 0.0. nó da lista de caracteres
 typedef struct node_alfabeto{
 
     char valor;
+
     struct node_alfabeto * proximo;
 }node_alfabeto;
 
@@ -16,13 +17,16 @@ typedef struct node_estados{
 
     int aceita;
     int indice_alfabeto;
+
     struct node_estados * proximo;
+    struct node_estados * adjacente;
 }node_estados;
 
 // 0.2. lista de caracteres
 typedef struct alfabeto{
 
     int tamanho;
+
     node_alfabeto * inicio;
 }alfabeto;
 
@@ -30,6 +34,7 @@ typedef struct alfabeto{
 typedef struct estados{
 
     int tamanho;
+
     node_estados * inicio;
 }estados;
 
@@ -40,7 +45,7 @@ typedef struct machine{
     estados * estados;
 }machine;
 
-// Funções ---------------------------------------------------------------------------
+/* Funções ---------------------------------------------------------------------------*/
 
 // 1.0. criação de um novo alfabeto
 alfabeto * novo_alfabeto(){
@@ -75,32 +80,86 @@ int  insere_caractere(machine * machine, char novo_simbolo){
     novo_node -> valor = novo_simbolo;
     novo_node -> proximo = NULL;
 
-    // se o alfabeto está vazio, apenas adicione o novo símbolo e retorne sucesso
     if(machine -> alfabeto -> inicio == NULL){
-
         machine -> alfabeto -> inicio = novo_node;
         machine -> alfabeto -> tamanho++;
     }
-    // se já houver símbolos
     else{
-
         node_alfabeto * auxiliar = machine -> alfabeto -> inicio;
-        // siga até achar o último nó, ou até achar um caractere repetido
-        while(auxiliar -> proximo != NULL && auxiliar -> valor != novo_simbolo){
 
+        while(auxiliar -> proximo != NULL && auxiliar -> valor != novo_simbolo){
             auxiliar = auxiliar -> proximo;
         }
-        // se chegou até aqui, ou é o último nó, ou é caractere repetido
         if(auxiliar -> valor != novo_simbolo){
-            // se for o último nó, insere o novo como próximo deste
             auxiliar -> proximo = novo_node;
             machine -> alfabeto -> tamanho++;
         }
-        // se for valor repetido, não adicione o nó e retorne fracasso
         else{
-
             resultado = 0;
         }
+    }
+    return resultado;
+}
+// 1.4. adição de um novo estado a uma máquina
+int insere_estado(machine * machine, int aceita){
+
+    int resultado = 1;
+
+    if(aceita == 0 || aceita == 1){
+
+        machine -> estados -> tamanho++;
+
+        node_estados * novo = (node_estados*)malloc(sizeof(node_estados));
+        novo -> aceita = aceita;
+        novo -> proximo = NULL;
+        novo -> adjacente = NULL;
+        novo -> indice_alfabeto = NONE;
+
+        if(machine -> estados -> inicio == NULL){
+            machine -> estados -> inicio = novo;
+        }
+        else{
+            node_estados * auxiliar = machine -> estados -> inicio;
+
+            while(auxiliar -> proximo != NULL){
+                auxiliar = auxiliar -> proximo;
+            }
+            auxiliar -> proximo = novo;
+        }
+    }
+    else{
+        resultado = 0;
+    }
+    return resultado;
+}
+// 1.5. criação dos links entre estados
+int link(machine * machine, int state1, int caractere, int state2){
+
+    int resultado = 1;
+
+    int comp1 = (caractere < machine -> alfabeto -> tamanho);
+    int comp2 = (state1 < machine -> estados -> tamanho);
+    int comp3 = (state2 < machine -> estados -> tamanho);
+
+    if(comp1 == 0 || comp2 == 0 || comp3 == 0){
+        resultado = 0;
+    }
+    else{
+        node_estados * auxiliar_vertical = machine -> estados -> inicio;
+        int indice_auxiliar_vertical = 0;
+
+        while(indice_auxiliar_vertical != state1){
+            auxiliar_vertical = auxiliar_vertical -> proximo;
+            indice_auxiliar_vertical++;
+        }
+        /*
+            já tenho um ponteiro no estado inicial na lista de estados
+            Só falta criar a lógica de inserir estados adjacentes a ele
+            sempre em ordem crescente e verificando se não estou inserindo
+            um estado adjacente com caractere repetido. Dada uma mesma 
+            transição e um mesmo estado inicial, não posso ter dois estados
+            resultantes diferentes.
+        */
     }
     return resultado;
 }
@@ -108,15 +167,29 @@ int  insere_caractere(machine * machine, char novo_simbolo){
 
 int main(void){
 
+    // -------------------------------------------------------
     machine * mach1 = novo_automato();
+
     insere_caractere(mach1, 'a');
     insere_caractere(mach1, 'b');
     insere_caractere(mach1, 'c');
     insere_caractere(mach1, 'd');
 
+    insere_estado(mach1, 1);
+    insere_estado(mach1, 1);
+    insere_estado(mach1, 1);
+
+    //int resu1 = link(mach1, 2, 0, 0);
+
+    // -------------------------------------------------------
     machine * mach2 = novo_automato();
+
     insere_caractere(mach2, '8');
     insere_caractere(mach2, '9');
+
+    insere_estado(mach2, 0);
+    insere_estado(mach2, 1);
+    insere_estado(mach2, 1);
 
     return 0;
 }
