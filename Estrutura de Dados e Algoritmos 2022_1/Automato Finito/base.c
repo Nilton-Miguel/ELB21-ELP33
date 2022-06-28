@@ -1,6 +1,8 @@
 # include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
 # define NONE -1
+# define ID_SIZE 2
 
 /* Estruturas ------------------------------------------------------------------------*/
 
@@ -15,6 +17,8 @@ typedef struct node_alfabeto{
 // 0.1. nó da lista de estados
 typedef struct node_estados{
 
+    char id[ID_SIZE];
+    int indice;
     int aceita;
     int indice_alfabeto;
 
@@ -101,7 +105,7 @@ int  insere_caractere(machine * machine, char novo_simbolo){
     return resultado;
 }
 // 1.4. adição de um novo estado a uma máquina
-int insere_estado(machine * machine, int aceita){
+int insere_estado(machine * machine, int aceita, char id[ID_SIZE], int indice){
 
     int resultado = 1;
 
@@ -110,10 +114,12 @@ int insere_estado(machine * machine, int aceita){
         machine -> estados -> tamanho++;
 
         node_estados * novo = (node_estados*)malloc(sizeof(node_estados));
+        strcpy(novo -> id, id);
         novo -> aceita = aceita;
         novo -> proximo = NULL;
         novo -> adjacente = NULL;
         novo -> indice_alfabeto = NONE;
+        novo -> indice = indice;
 
         if(machine -> estados -> inicio == NULL){
             machine -> estados -> inicio = novo;
@@ -152,44 +158,89 @@ int link(machine * machine, int state1, int caractere, int state2){
             auxiliar_vertical = auxiliar_vertical -> proximo;
             indice_auxiliar_vertical++;
         }
-        /*
-            já tenho um ponteiro no estado inicial na lista de estados
-            Só falta criar a lógica de inserir estados adjacentes a ele
-            sempre em ordem crescente e verificando se não estou inserindo
-            um estado adjacente com caractere repetido. Dada uma mesma 
-            transição e um mesmo estado inicial, não posso ter dois estados
-            resultantes diferentes.
-        */
+        node_estados * auxiliar_horizontal = auxiliar_vertical;
+
+        auxiliar_vertical = machine -> estados -> inicio;
+        indice_auxiliar_vertical = 0;
+
+        while(indice_auxiliar_vertical != state2){
+            auxiliar_vertical = auxiliar_vertical -> proximo;
+            indice_auxiliar_vertical++;
+        }
+        node_estados * novo = (node_estados*)malloc(sizeof(node_estados));
+        novo -> aceita = auxiliar_vertical -> aceita;
+        novo -> indice = auxiliar_vertical -> indice;
+        novo -> proximo = NULL;
+        novo -> adjacente = NULL;
+        novo -> indice_alfabeto = caractere;
+        strcpy(novo -> id, auxiliar_vertical -> id);
+
+        if(auxiliar_horizontal -> adjacente == NULL){
+            auxiliar_horizontal -> adjacente = novo;
+        }
+        else{
+            while(auxiliar_horizontal -> adjacente != NULL && auxiliar_horizontal -> adjacente -> indice_alfabeto < caractere){
+                auxiliar_horizontal = auxiliar_horizontal -> adjacente;
+            }
+            if(auxiliar_horizontal -> adjacente != NULL && auxiliar_horizontal -> adjacente -> indice_alfabeto == caractere){
+                novo -> adjacente = auxiliar_horizontal -> adjacente -> adjacente;
+                auxiliar_horizontal -> adjacente = novo;
+            }
+            else{
+                novo -> adjacente = auxiliar_horizontal -> adjacente;
+                auxiliar_horizontal -> adjacente = novo;
+            }
+        }
+    }
+    return resultado;
+}
+// 1.6. processamento de uma cadeia de texto
+int processa(machine * mach, char * texto, int indice, node_estados * estado_atual){
+
+    int resultado = 1;
+
+    // quando chegar no caractere \0, não há mais texto para processar
+    if(texto[indice] != '\0'){
+        
+        // converte o caractere do texto para um índice do alfabeto da máquina
+        int indice_solicitado = 0;
+        node_alfabeto * tradutor = mach -> alfabeto -> inicio;
+        while(tradutor != NULL && tradutor -> valor != texto[indice]){
+
+            tradutor = tradutor -> proximo;
+            indice_solicitado++;
+        }
+        if(tradutor == NULL){
+            resultado = 0;
+        }
+
+        //  Se eu sair do estado_atual em qual outro estado eu chego ?
+        while(estado_atual != NULL && estado_atual -> indice_alfabeto != indice_solicitado){
+            estado_atual = estado_atual -> adjacente;
+        }
+        // se com esse caractere a máquina não vai pra estado nenhum, ela está no estado morto e já era
+        if(estado_atual == NULL){
+            resultado = 0;
+        }
+        //  se achou o Estado, anota o índice dele e posiciona o ponteiro nessa linha para a próxima call recursiva
+        else{
+            int indice_proximo = estado_atual -> indice;
+            estado_atual = mach -> estados -> inicio;
+            while(estado_atual != NULL && estado_atual -> indice != indice_proximo){
+                estado_atual = estado_atual -> proximo;
+            }
+            // fez a transição, agora o resultado depende da próxima
+            resultado = processa(mach, texto, indice+1, estado_atual);
+        }
+    }
+    else if(estado_atual -> aceita == 0){
+        resultado = 0;
     }
     return resultado;
 }
 // -----------------------------------------------------------------------------------
 
 int main(void){
-
-    // -------------------------------------------------------
-    machine * mach1 = novo_automato();
-
-    insere_caractere(mach1, 'a');
-    insere_caractere(mach1, 'b');
-    insere_caractere(mach1, 'c');
-    insere_caractere(mach1, 'd');
-
-    insere_estado(mach1, 1);
-    insere_estado(mach1, 1);
-    insere_estado(mach1, 1);
-
-    //int resu1 = link(mach1, 2, 0, 0);
-
-    // -------------------------------------------------------
-    machine * mach2 = novo_automato();
-
-    insere_caractere(mach2, '8');
-    insere_caractere(mach2, '9');
-
-    insere_estado(mach2, 0);
-    insere_estado(mach2, 1);
-    insere_estado(mach2, 1);
 
     return 0;
 }
