@@ -202,7 +202,7 @@ int processa(machine * mach, char * texto, int indice, node_estados * estado_atu
     // quando chegar no caractere \0, não há mais texto para processar
     if(texto[indice] != '\0'){
         
-        // converte o caractere do texto para um índice do alfabeto da máquina
+        // 1 converte o caractere do texto para um índice do alfabeto da máquina
         int indice_solicitado = 0;
         node_alfabeto * tradutor = mach -> alfabeto -> inicio;
         while(tradutor != NULL && tradutor -> valor != texto[indice]){
@@ -210,19 +210,23 @@ int processa(machine * mach, char * texto, int indice, node_estados * estado_atu
             tradutor = tradutor -> proximo;
             indice_solicitado++;
         }
+        // se o caractere no texto não faz parte do alfabeto, a máquina não o conhece
         if(tradutor == NULL){
+            // recursivamente retorna 0
             resultado = 0;
         }
+        // 1 -------------------------------------------------------------------
 
-        //  Se eu sair do estado_atual em qual outro estado eu chego ?
+        //  Se eu sair do estado_atual em qual outro estado eu chego com esse caractere ?
         while(estado_atual != NULL && estado_atual -> indice_alfabeto != indice_solicitado){
             estado_atual = estado_atual -> adjacente;
         }
-        // se com esse caractere a máquina não vai pra estado nenhum, ela está no estado morto e já era
+        // não achou nenhum estado com esse caractere como transição, máquina caiu no estado morto
         if(estado_atual == NULL){
+            // recursivamente devolve 0
             resultado = 0;
         }
-        //  se achou o Estado, anota o índice dele e posiciona o ponteiro nessa linha para a próxima call recursiva
+        //  se achou o estado, anota o índice dele e posiciona o ponteiro nessa linha para a próxima call recursiva
         else{
             int indice_proximo = estado_atual -> indice;
             estado_atual = mach -> estados -> inicio;
@@ -233,6 +237,7 @@ int processa(machine * mach, char * texto, int indice, node_estados * estado_atu
             resultado = processa(mach, texto, indice+1, estado_atual);
         }
     }
+    // se o caractere no texto for um \0, vamos testar qual a aceitação do estado em que o ponteiro está atualmente estacionado, se não for de aceitação, a máquina não aceita.
     else if(estado_atual -> aceita == 0){
         resultado = 0;
     }
@@ -250,45 +255,34 @@ int main(void){
     // alfabeto de mach1 ( Algarismos aceitos )
     insere_caractere(mach1, '0');
     insere_caractere(mach1, '1');
-    insere_caractere(mach1, '2');
 
     // coleção de estados de mach1
-    insere_estado(mach1, 1, "1a", 0);
-    insere_estado(mach1, 0, "1b", 1);
-    insere_estado(mach1, 1, "1c", 2);
+    insere_estado(mach1, 1, "pr", 0);
+    insere_estado(mach1, 0, "ip", 1);
 
     // transições de 1a 
     link(mach1, 0, 0, 0);
     link(mach1, 0, 1, 1);
-    link(mach1, 0, 2, 2);
 
-    // transições de 1b 
+    // transições de 1a 
     link(mach1, 1, 0, 0);
     link(mach1, 1, 1, 1);
-    link(mach1, 1, 2, 2);
-
-    // transições de 1c
-    link(mach1, 2, 0, 0);
-    link(mach1, 2, 1, 1);
-    link(mach1, 2, 2, 2);
 
     node_estados * inicial = mach1 -> estados -> inicio;
 
     // Só números pares retornam 1
 
-    int n1 = processa(mach1, "0\0", 0, inicial);
-    int n2 = processa(mach1, "1\0", 0, inicial);
-    int n3 = processa(mach1, "2\0", 0, inicial);
-
-    int n4 = processa(mach1, "00\0", 0, inicial);
-    int n5 = processa(mach1, "01\0", 0, inicial);
-    int n6 = processa(mach1, "02\0", 0, inicial);
-    int n7 = processa(mach1, "10\0", 0, inicial);
-    int n8 = processa(mach1, "11\0", 0, inicial);
-    int n9 = processa(mach1, "12\0", 0, inicial);
-    int n10 = processa(mach1, "20\0", 0, inicial);
-    int n11 = processa(mach1, "21\0", 0, inicial);
-    int n12 = processa(mach1, "22\0", 0, inicial);
+    // essa máquina, da forma como foi desenhada, aceita o caractere nulo
+    int nx = processa(mach1, "\0", 0, inicial); //vazio
+    
+    int n0 = processa(mach1, "000\0", 0, inicial); //0
+    int n1 = processa(mach1, "001\0", 0, inicial); //1
+    int n2 = processa(mach1, "010\0", 0, inicial); //2
+    int n3 = processa(mach1, "011\0", 0, inicial); //3
+    int n4 = processa(mach1, "100\0", 0, inicial); //4
+    int n5 = processa(mach1, "101\0", 0, inicial); //5
+    int n6 = processa(mach1, "110\0", 0, inicial); //6
+    int n7 = processa(mach1, "111\0", 0, inicial); //7
 
     return 0;
 }

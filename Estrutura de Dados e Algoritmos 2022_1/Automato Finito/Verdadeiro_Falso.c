@@ -202,7 +202,7 @@ int processa(machine * mach, char * texto, int indice, node_estados * estado_atu
     // quando chegar no caractere \0, não há mais texto para processar
     if(texto[indice] != '\0'){
         
-        // converte o caractere do texto para um índice do alfabeto da máquina
+        // 1 converte o caractere do texto para um índice do alfabeto da máquina
         int indice_solicitado = 0;
         node_alfabeto * tradutor = mach -> alfabeto -> inicio;
         while(tradutor != NULL && tradutor -> valor != texto[indice]){
@@ -210,19 +210,23 @@ int processa(machine * mach, char * texto, int indice, node_estados * estado_atu
             tradutor = tradutor -> proximo;
             indice_solicitado++;
         }
+        // se o caractere no texto não faz parte do alfabeto, a máquina não o conhece
         if(tradutor == NULL){
+            // recursivamente retorna 0
             resultado = 0;
         }
+        // 1 -------------------------------------------------------------------
 
-        //  Se eu sair do estado_atual em qual outro estado eu chego ?
+        //  Se eu sair do estado_atual em qual outro estado eu chego com esse caractere ?
         while(estado_atual != NULL && estado_atual -> indice_alfabeto != indice_solicitado){
             estado_atual = estado_atual -> adjacente;
         }
-        // se com esse caractere a máquina não vai pra estado nenhum, ela está no estado morto e já era
+        // não achou nenhum estado com esse caractere como transição, máquina caiu no estado morto
         if(estado_atual == NULL){
+            // recursivamente devolve 0
             resultado = 0;
         }
-        //  se achou o Estado, anota o índice dele e posiciona o ponteiro nessa linha para a próxima call recursiva
+        //  se achou o estado, anota o índice dele e posiciona o ponteiro nessa linha para a próxima call recursiva
         else{
             int indice_proximo = estado_atual -> indice;
             estado_atual = mach -> estados -> inicio;
@@ -233,6 +237,7 @@ int processa(machine * mach, char * texto, int indice, node_estados * estado_atu
             resultado = processa(mach, texto, indice+1, estado_atual);
         }
     }
+    // se o caractere no texto for um \0, vamos testar qual a aceitação do estado em que o ponteiro está atualmente estacionado, se não for de aceitação, a máquina não aceita.
     else if(estado_atual -> aceita == 0){
         resultado = 0;
     }
@@ -243,65 +248,35 @@ int processa(machine * mach, char * texto, int indice, node_estados * estado_atu
 int main(void){
 
     /*  Uma máquina que só aceita cadeias de texto em que o
-        jogador vença uma partida de Rock Paper Scisors */
+        número seja formado do alfabeto "0 1 2" e seja par */
 
     machine * mach1 = novo_automato();
 
-    // alfabeto de mach1 ( Opções do Jogo )
-    insere_caractere(mach1, 'R');
-    insere_caractere(mach1, 'P');
-    insere_caractere(mach1, 'S');
+    // alfabeto de mach1 ( Algarismos aceitos )
+    insere_caractere(mach1, 'V');
+    insere_caractere(mach1, 'F');
 
     // coleção de estados de mach1
     insere_estado(mach1, 0, "in", 0);
-    insere_estado(mach1, 0, "R_", 1);
-    insere_estado(mach1, 0, "P_", 2);
-    insere_estado(mach1, 0, "S_", 3);
-    insere_estado(mach1, 1, "vc", 4);
+    insere_estado(mach1, 0, "1_", 1);
+    insere_estado(mach1, 0, "2_", 2);
+    insere_estado(mach1, 0, "3_", 3);
+    insere_estado(mach1, 1, "sc", 4);
 
-    // transições de 1a ( Jogada do primeiro Jogador )
+    // 0010 = VVFV que é o gabarito da questão
     link(mach1, 0, 0, 1);
-    link(mach1, 0, 1, 2);
-    link(mach1, 0, 2, 3);
-
-    // transições restantes ( em que o 2º Jogador vence )
-    link(mach1, 1, 1, 4);
-    link(mach1, 2, 2, 4);
+    link(mach1, 1, 0, 2);
+    link(mach1, 2, 1, 3);
     link(mach1, 3, 0, 4);
 
     node_estados * inicial = mach1 -> estados -> inicio;
-
-    // Jogos inválidos ( Segundo jogador desistiu )
-    int I1 = processa(mach1, "R\0", 0, inicial);
-    int I2 = processa(mach1, "P\0", 0, inicial);
-    int I3 = processa(mach1, "S\0", 0, inicial);
-
-    // Jogos válidos em que o 2º Jogador perde ou empata
-    int E1 = processa(mach1, "RR\0", 0, inicial);
-    int E2 = processa(mach1, "PP\0", 0, inicial);
-    int E3 = processa(mach1, "SS\0", 0, inicial);
-
-    int D1 = processa(mach1, "PR\0", 0, inicial);
-    int D2 = processa(mach1, "SP\0", 0, inicial);
-    int D3 = processa(mach1, "RS\0", 0, inicial);
-
-    // Jogos em que o 2º Jogador vence
-    int V1 = processa(mach1, "RP\0", 0, inicial);
-    int V2 = processa(mach1, "SR\0", 0, inicial);
-    int V3 = processa(mach1, "PS\0", 0, inicial);
-
-    // Jogos inválidos ( mais de 2 Jogadas )
-    int I4 = processa(mach1, "RRR\0", 0, inicial);
-    int I5 = processa(mach1, "RRP\0", 0, inicial);
-    int I6 = processa(mach1, "RRS\0", 0, inicial);
-
-    int I7 = processa(mach1, "RPR\0", 0, inicial);
-    int I8 = processa(mach1, "RPP\0", 0, inicial);
-    int I9 = processa(mach1, "RPS\0", 0, inicial);
     
-    int I10 = processa(mach1, "RSR\0", 0, inicial);
-    int I11 = processa(mach1, "RSP\0", 0, inicial);
-    int I12 = processa(mach1, "RSS\0", 0, inicial);
+    int n0 = processa(mach1, "\0", 0, inicial);
+
+    int n1 = processa(mach1, "VVVV\0", 0, inicial);
+    int n2 = processa(mach1, "FFFF\0", 0, inicial);
+    int n3 = processa(mach1, "VFVF\0", 0, inicial);
+    int n4 = processa(mach1, "VVFV\0", 0, inicial);
 
     return 0;
 }
