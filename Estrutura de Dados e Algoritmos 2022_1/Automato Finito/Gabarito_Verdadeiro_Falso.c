@@ -270,6 +270,10 @@ int main(void){
     link(mach1, 3, 0, 4);
 
     node_estados * inicial = mach1 -> estados -> inicio;
+
+    int VV = processa(mach1, "VV\0", 0, inicial);
+    int FVVF = processa(mach1, "FVVF\0", 0, inicial);
+    int VVFV = processa(mach1, "VVFV\0", 0, inicial);
     
     int n0 = processa(mach1, "\0", 0, inicial);
 

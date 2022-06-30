@@ -184,7 +184,9 @@ int link(machine * machine, int state1, int caractere, int state2){
             }
             if(auxiliar_horizontal -> adjacente != NULL && auxiliar_horizontal -> adjacente -> indice_alfabeto == caractere){
                 novo -> adjacente = auxiliar_horizontal -> adjacente -> adjacente;
+                node_estados * del = auxiliar_horizontal -> adjacente;
                 auxiliar_horizontal -> adjacente = novo;
+                free(del);
             }
             else{
                 novo -> adjacente = auxiliar_horizontal -> adjacente;

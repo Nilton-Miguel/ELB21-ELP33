@@ -275,14 +275,14 @@ int main(void){
     // essa máquina, da forma como foi desenhada, aceita o caractere nulo
     int nx = processa(mach1, "\0", 0, inicial); //vazio
     
-    int n0 = processa(mach1, "000\0", 0, inicial); //0
-    int n1 = processa(mach1, "001\0", 0, inicial); //1
-    int n2 = processa(mach1, "010\0", 0, inicial); //2
-    int n3 = processa(mach1, "011\0", 0, inicial); //3
-    int n4 = processa(mach1, "100\0", 0, inicial); //4
-    int n5 = processa(mach1, "101\0", 0, inicial); //5
-    int n6 = processa(mach1, "110\0", 0, inicial); //6
-    int n7 = processa(mach1, "111\0", 0, inicial); //7
+    //int n0 = processa(mach1, "000\0", 0, inicial); //0
+    int n001 = processa(mach1, "001\0", 0, inicial); //1
+    //int n2 = processa(mach1, "010\0", 0, inicial); //2
+    //int n3 = processa(mach1, "011\0", 0, inicial); //3
+    int n100 = processa(mach1, "100\0", 0, inicial); //4
+    //int n5 = processa(mach1, "101\0", 0, inicial); //5
+    //int n6 = processa(mach1, "110\0", 0, inicial); //6
+    //int n7 = processa(mach1, "111\0", 0, inicial); //7
 
     return 0;
 }
